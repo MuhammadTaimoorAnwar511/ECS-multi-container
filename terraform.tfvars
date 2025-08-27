@@ -1,82 +1,176 @@
-# VPC
-region          = "us-east-1"
-vpc_name        = "project-vpc"
-vpc_cidr        = "10.0.0.0/16"
-azs             = ["us-east-1a", "us-east-1b"]
-public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
+#######################################
+# VPC CONFIGURATION
+#######################################
+
+# AWS region to deploy resources
+region = "us-east-1"
+
+# Name for the VPC
+vpc_name = "project-vpc"
+
+# VPC CIDR block (IP range)
+vpc_cidr = "10.0.0.0/16"
+
+# Availability Zones to use (make sure these exist in your region)
+azs = ["us-east-1a", "us-east-1b"]
+
+# Public subnets (used for load balancer, NAT gateway, etc.)
+public_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
+
+# Private subnets (used for ECS tasks/services)
 private_subnets = ["10.0.3.0/24", "10.0.4.0/24"]
 
-# Security Group
-sg_name             = "project-alb-sg"
+
+#######################################
+# SECURITY GROUPS
+#######################################
+
+# Security group for the Application Load Balancer
+sg_name = "project-alb-sg"
+
+# Security group for ECS service tasks
 ecs_service_sg_name = "project-ecs-service-sg"
 
-# ALB + TG
-alb_name          = "project-alb"
+
+#######################################
+# LOAD BALANCER + TARGET GROUP
+#######################################
+
+# Name of Application Load Balancer (ALB)
+alb_name = "project-alb"
+
+# Name of Target Group for routing traffic to ECS service
 target_group_name = "project-tg"
 
-# ECS Cluster
+
+#######################################
+# ECS CLUSTER
+#######################################
+
+# ECS Cluster name
 cluster_name = "project-cluster"
 
+# Toggle whether to create task definition + ECS service
 want_to_create_taskdef_and_service = true
 
-# ECS Task Definition
-task_family = "project-task"
-task_cpu    = "512"
-task_memory = "1024"
 
+#######################################
+# ECS TASK DEFINITION
+#######################################
+
+# Family name (identifier) for ECS task definition
+task_family = "project-task"
+
+# Task-level CPU and Memory (applies to the whole task)
+# Must follow valid Fargate combinations (e.g. 512/1024/2048 CPU with 1–30 GB memory)
+task_cpu    = "768"   # 256 → 0.25 vCPU
+task_memory = "1536"  # 512mb → 0.5 GB RAM
+
+# Containers inside the ECS task
+# Each container can define its own CPU, memory, ports, environment variables, dependencies, etc.
 containers = [
+
+  ###################################
+  # Redis Container
+  ###################################
   {
-    name              = "redis"
-    image             = "redis:alpine"
-    port              = 6379
-    cpu               = 128
-    gpu               = ""
-    memory_hard_limit = 256
-    memory_soft_limit = 128
-    essential         = true
-    environment       = []
-    dependencies      = []
-    health_check = {
+    name              = "redis"             # Container name
+    image             = "redis:alpine"      # Docker image
+    port              = 6379                # Exposed port
+    cpu               = 256                 # CPU units (share of task CPU)
+    gpu               = ""                  # Leave empty unless using GPU instances
+    memory_hard_limit = 512                 # Max memory (container will be killed if exceeded)
+    memory_soft_limit = 256                 # Reserved memory (guaranteed)
+    essential         = true                # Task fails if this container fails
+    environment       = []                  # No custom env vars
+    dependencies      = []                  # No startup dependencies
+    health_check = {                        # ECS health check
       command     = ["CMD-SHELL", "redis-cli ping | grep PONG"]
       interval    = 30
       retries     = 3
       startPeriod = 10
       timeout     = 5
     }
-    
   },
+
+  ###################################
+  # MongoDB Container
+  ###################################
+  {
+    name              = "mongo"
+    image             = "mongo:latest"
+    port              = 27017
+    cpu               = 256
+    gpu               = ""
+    memory_hard_limit = 512
+    memory_soft_limit = 256
+    essential         = true
+    environment       = [                   # MongoDB requires root credentials
+      { name = "MONGO_INITDB_ROOT_USERNAME", value = "root" },
+      { name = "MONGO_INITDB_ROOT_PASSWORD", value = "example" }
+    ]
+    dependencies      = []
+    health_check = {
+      command     = ["CMD-SHELL", "mongosh --username root --password example --eval \"db.adminCommand('ping')\" || exit 1"]
+      interval    = 30
+      retries     = 3
+      startPeriod = 20
+      timeout     = 5
+    }
+  },
+
+  ###################################
+  # Application Container
+  ###################################
   {
     name              = "project-app"
-    image             = "084828600005.dkr.ecr.us-east-1.amazonaws.com/taimoor/project:latest"
+    image             = "084828600005.dkr.ecr.us-east-1.amazonaws.com/taimoor/project:latest" # Replace with your ECR image
     port              = 5000
     cpu               = 256
     gpu               = ""
     memory_hard_limit = 512
     memory_soft_limit = 256
     essential         = true
-    environment = [
+    environment = [                               # Application environment variables
       { name = "PORT", value = "5000" },
-      { name = "MONGODB_URI", value = "mongodb+srv://i211232:2r7SuFkegy9xohZy@cluster0.pvffmnh.mongodb.net/taimoor" },
+      { name = "MONGODB_URI", value = "mongodb://root:example@127.0.0.1:27017/taimoor?authSource=admin" },
       { name = "REDIS_URL", value = "redis://127.0.0.1:6379" }
     ]
-    dependencies = [
-      { containerName = "redis", condition = "HEALTHY" }
+    dependencies = [                              # Start app only after DB + Cache are healthy
+      { containerName = "redis", condition = "HEALTHY" },
+      { containerName = "mongo", condition = "HEALTHY" }
     ]
-    # 🚫 No healthCheck block here
+    # Optional: Add health check for your app (uncomment and modify if needed)
+    # health_check = { }
   }
 ]
 
+#######################################
+# ECS SERVICE CONFIGURATION
+#######################################
 
-# Service
-ecs_service_name              = "project-service"
-desired_count                 = 1
-min_count                     = 1
-max_count                     = 2
-scaling_policy_name           = "project-scaling-policy"
-scaling_metric                = "ECSServiceAverageCPUUtilization"  # "ECSServiceAverageCPUUtilization" or "ECSServiceAverageMemoryUtilization"
-load_balanced_container_name  = "project-app"
-load_balanced_container_port  = 5000
+# Name of the ECS Service
+ecs_service_name = "project-service"
 
-# Tags
-environment = "development"
-owner       = "devops-team"
+# Desired number of running tasks (can scale between min and max)
+desired_count = 1
+min_count     = 1
+max_count     = 2
+
+# Auto-scaling policy
+scaling_policy_name = "project-scaling-policy"
+
+# Choose scaling metric: "ECSServiceAverageCPUUtilization" or "ECSServiceAverageMemoryUtilization"
+scaling_metric = "ECSServiceAverageCPUUtilization"
+
+# Container that should be attached to the ALB (your app container)
+load_balanced_container_name = "project-app"
+load_balanced_container_port = 5000
+
+
+#######################################
+# TAGGING (for cost allocation & ownership)
+#######################################
+
+environment = "development"   # e.g. dev / staging / prod
+owner       = "devops-team"   # Who owns this infra
