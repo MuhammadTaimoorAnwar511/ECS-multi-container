@@ -73,7 +73,7 @@ desired_count                 = 1
 min_count                     = 1
 max_count                     = 2
 scaling_policy_name           = "project-scaling-policy"
-scaling_metric                = "ECSServiceAverageCPUUtilization"
+scaling_metric                = "ECSServiceAverageCPUUtilization"  # "ECSServiceAverageCPUUtilization" or "ECSServiceAverageMemoryUtilization"
 load_balanced_container_name  = "project-app"
 load_balanced_container_port  = 5000
 
