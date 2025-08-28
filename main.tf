@@ -112,7 +112,8 @@ module "ecs_service" {
   target_group_arn  = module.target_group.target_group_arn
 
   scaling_policy_name = var.scaling_policy_name
-  scaling_metric      = var.scaling_metric
+  scaling_metrics     = var.scaling_metrics 
+
   tags = {
     Environment = var.environment
     Owner       = var.owner

@@ -50,9 +50,11 @@ resource "aws_appautoscaling_target" "ecs" {
   service_namespace  = "ecs"
 }
 
-# Auto Scaling Policy
+# Auto Scaling Policies: dynamically create one for each metric
 resource "aws_appautoscaling_policy" "ecs_target" {
-  name               = var.scaling_policy_name
+  for_each = toset(var.scaling_metrics)  # CPU or Memory
+
+  name               = "${var.scaling_policy_name}-${each.key}"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.ecs.resource_id
   scalable_dimension = aws_appautoscaling_target.ecs.scalable_dimension
@@ -60,7 +62,7 @@ resource "aws_appautoscaling_policy" "ecs_target" {
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
-      predefined_metric_type = var.scaling_metric
+      predefined_metric_type = each.key
     }
     target_value       = 70
     scale_in_cooldown  = 300
@@ -68,3 +70,4 @@ resource "aws_appautoscaling_policy" "ecs_target" {
     disable_scale_in   = false
   }
 }
+

@@ -19,9 +19,9 @@ variable "ecs_service_sg_id" { type = string }
 variable "target_group_arn" { type = string }
 
 variable "scaling_policy_name" { type = string }
-variable "scaling_metric" {
-  type    = string
-  default = "ECSServiceAverageCPUUtilization"
+variable "scaling_metrics" {
+  type        = list(string)
+  default     = ["ECSServiceAverageCPUUtilization"]
 }
 
 variable "tags" {

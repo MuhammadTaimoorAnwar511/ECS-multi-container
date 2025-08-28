@@ -103,10 +103,11 @@ variable "desired_count"    { type = number }
 variable "min_count"        { type = number }
 variable "max_count"        { type = number }
 variable "scaling_policy_name" { type = string }
-variable "scaling_metric" {
-  type    = string
-  default = "ECSServiceAverageCPUUtilization"
+variable "scaling_metrics" {
+  type        = list(string)
+  default     = ["ECSServiceAverageCPUUtilization"]
 }
+
 
 # Which container is behind ALB
 variable "load_balanced_container_name" { type = string }

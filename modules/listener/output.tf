@@ -1,3 +1,4 @@
+# modules/listener/output.tf
 output "https_listener_arn" {
   value = try(aws_lb_listener.https[0].arn, null)
 }

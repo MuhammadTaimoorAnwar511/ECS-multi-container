@@ -170,8 +170,7 @@ max_count     = 2
 scaling_policy_name = "project-scaling-policy"
 
 # Choose scaling metric: "ECSServiceAverageCPUUtilization" or "ECSServiceAverageMemoryUtilization"
-scaling_metric = "ECSServiceAverageCPUUtilization"
-
+scaling_metrics = ["ECSServiceAverageCPUUtilization", "ECSServiceAverageMemoryUtilization"]
 # Container that should be attached to the ALB (your app container)
 load_balanced_container_name = "project-app"
 load_balanced_container_port = 5000
