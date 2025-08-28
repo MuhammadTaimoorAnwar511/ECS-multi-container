@@ -127,3 +127,15 @@ variable "create_acm" {
 }
 variable "domain_name" { type = string }
 variable "hosted_zone_id" { type = string}
+# HTTPS Listner
+variable "create_https_listener" {
+  description = "Whether to create HTTPS listener for ALB"
+  type        = bool
+  default     = true
+}
+variable "https_domain" {
+  description = "Domain name to use in HTTPS listener Host Header and Route53 record"
+  type        = string
+  default     = "backend.taimoor.site"
+}
+

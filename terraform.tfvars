@@ -1,5 +1,16 @@
 #ROOT(terraform.tfvars)
 #######################################
+# DEFAULT
+#######################################
+
+# Toggle whether to create: task definition + ECS service 
+want_to_create_taskdef_and_service = true
+# Toggle whether to create: ACM + Route53 creation
+create_acm = true 
+# Toggle whether to create: HTTPS Listner + Route53 Record
+create_https_listener = true 
+
+#######################################
 # VPC CONFIGURATION
 #######################################
 
@@ -51,10 +62,6 @@ health_check_matcher  = "200"
 
 # ECS Cluster name
 cluster_name = "project-cluster"
-
-# Toggle whether to create task definition + ECS service
-want_to_create_taskdef_and_service = true
-
 
 #######################################
 # ECS TASK DEFINITION
@@ -172,12 +179,17 @@ load_balanced_container_port = 5000
 #######################################
 # ACM CERTIFICATE
 #######################################
-create_acm = true  # or false to skip ACM + Route53 creation
+
 # Your domain (must already exist in Route53)
 domain_name   = "*.taimoor.site"
-
 # Hosted zone ID for the domain in Route53
 hosted_zone_id = "Z0700718GCRWXN5WH2MS"
+
+#######################################
+# HTTPS LISTNER
+#######################################
+
+https_domain          = "backend.taimoor.site"
 
 #######################################
 # TAGGING (for cost allocation & ownership)

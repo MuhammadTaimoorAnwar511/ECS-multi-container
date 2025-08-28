@@ -52,4 +52,3 @@ output "acm_certificate_domain" {
 output "acm_certificate_validation_status" {
   value = try(module.acm.certificate_validation_status, null)
 }
-

@@ -8,6 +8,7 @@
 ### terraform validate
 ### terraform plan
 ### terraform apply
+### terraform state list
 ### terraform destroy -auto-approve
 
 ==================================

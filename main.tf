@@ -129,4 +129,14 @@ module "acm" {
   create_acm     = var.create_acm  # NEW
 }
 
-
+module "https_listener" {
+  source                  = "./modules/listener"
+  create_https_listener   = var.create_https_listener
+  alb_arn                 = module.alb.alb_arn
+  target_group_arn        = module.target_group.target_group_arn
+  certificate_arn         = module.acm.certificate_arn
+  https_domain            = var.https_domain
+  hosted_zone_id          = var.hosted_zone_id
+  alb_dns_name            = module.alb.alb_dns_name
+  alb_zone_id             = module.alb.alb_zone_id
+}
