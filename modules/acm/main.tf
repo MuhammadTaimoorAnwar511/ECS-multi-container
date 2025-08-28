@@ -1,0 +1,26 @@
+resource "aws_acm_certificate" "this" {
+  count             = var.create_acm ? 1 : 0
+  domain_name       = var.domain_name
+  validation_method = "DNS"
+  key_algorithm     = "RSA_2048"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+resource "aws_route53_record" "validation" {
+  count = var.create_acm ? length(tolist(aws_acm_certificate.this[0].domain_validation_options)) : 0
+
+  zone_id = var.hosted_zone_id
+  name    = tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_name
+  type    = tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_type
+  records = [tolist(aws_acm_certificate.this[0].domain_validation_options)[count.index].resource_record_value]
+  ttl     = 60
+}
+
+resource "aws_acm_certificate_validation" "this" {
+  count = var.create_acm ? 1 : 0
+
+  certificate_arn         = aws_acm_certificate.this[0].arn
+  validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
+}

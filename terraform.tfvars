@@ -42,7 +42,8 @@ alb_name = "project-alb"
 
 # Name of Target Group for routing traffic to ECS service
 target_group_name = "project-tg"
-
+health_check_path     = "/health"
+health_check_matcher  = "200"
 
 #######################################
 # ECS CLUSTER
@@ -64,8 +65,8 @@ task_family = "project-task"
 
 # Task-level CPU and Memory (applies to the whole task)
 # Must follow valid Fargate combinations (e.g. 512/1024/2048 CPU with 1–30 GB memory)
-task_cpu    = "768"   # 256 → 0.25 vCPU
-task_memory = "1536"  # 512mb → 0.5 GB RAM
+task_cpu    = "1024"   # 256 → 0.25 vCPU
+task_memory = "2048"  # 512mb → 0.5 GB RAM
 
 # Containers inside the ECS task
 # Each container can define its own CPU, memory, ports, environment variables, dependencies, etc.
@@ -142,7 +143,7 @@ containers = [
       { containerName = "mongo", condition = "HEALTHY" }
     ]
     # Optional: Add health check for your app (uncomment and modify if needed)
-    # health_check = { }
+    health_check = null
   }
 ]
 
@@ -168,6 +169,15 @@ scaling_metric = "ECSServiceAverageCPUUtilization"
 load_balanced_container_name = "project-app"
 load_balanced_container_port = 5000
 
+#######################################
+# ACM CERTIFICATE
+#######################################
+create_acm = true  # or false to skip ACM + Route53 creation
+# Your domain (must already exist in Route53)
+domain_name   = "*.taimoor.site"
+
+# Hosted zone ID for the domain in Route53
+hosted_zone_id = "Z0700718GCRWXN5WH2MS"
 
 #######################################
 # TAGGING (for cost allocation & ownership)

@@ -42,3 +42,14 @@ output "ecs_service_arn" {
   value = try(module.ecs_service[0].ecs_service_arn, null)
 }
 
+# ACM Certificate
+output "acm_certificate_arn" {
+  value = try(module.acm.certificate_arn, null)
+}
+output "acm_certificate_domain" {
+  value = try(module.acm.certificate_domain, null)
+}
+output "acm_certificate_validation_status" {
+  value = try(module.acm.certificate_validation_status, null)
+}
+

@@ -40,8 +40,18 @@ module "ecs_service_sg" {
 
 module "target_group" {
   source            = "./modules/target-group"
-  target_group_name = "project-tg"
+  target_group_name = var.target_group_name
   vpc_id            = module.vpc.vpc_id
+
+  # Health Check Parameters
+  health_check_path      = var.health_check_path
+  health_check_matcher   = var.health_check_matcher
+  health_check_port      = var.health_check_port
+  health_check_interval  = var.health_check_interval
+  health_check_timeout   = var.health_check_timeout
+  healthy_threshold      = var.healthy_threshold
+  unhealthy_threshold    = var.unhealthy_threshold
+
   tags = {
     Environment = var.environment
     Owner       = var.owner
@@ -109,5 +119,14 @@ module "ecs_service" {
   }
 }
 
+module "acm" {
+  source         = "./modules/acm"
+  domain_name    = var.domain_name
+  hosted_zone_id = var.hosted_zone_id
+  environment    = var.environment
+  owner          = var.owner
+  tags           = var.tags
+  create_acm     = var.create_acm  # NEW
+}
 
 

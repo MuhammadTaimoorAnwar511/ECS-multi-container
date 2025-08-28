@@ -13,6 +13,34 @@ variable "sg_name" { type = string }
 # Target Group
 variable "target_group_name" { type = string }
 
+variable "health_check_path" {
+  type        = string
+  default     = "/"
+}
+variable "health_check_matcher" {
+  type        = string
+  default     = "200"
+}
+variable "health_check_port" {
+  type        = string
+  default     = "traffic-port"
+}
+variable "health_check_interval" {
+  type        = number
+  default     = 30
+}
+variable "health_check_timeout" {
+  type        = number
+  default     = 5
+}
+variable "healthy_threshold" {
+  type        = number
+  default     = 5
+}
+variable "unhealthy_threshold" {
+  type        = number
+  default     = 3
+}
 # ALB
 variable "alb_name" { type = string }
 
@@ -92,3 +120,10 @@ variable "tags" {
   type    = map(string)
   default = {}
 }
+# ACM Certificate
+variable "create_acm" {
+  type        = bool
+  default     = true
+}
+variable "domain_name" { type = string }
+variable "hosted_zone_id" { type = string}
