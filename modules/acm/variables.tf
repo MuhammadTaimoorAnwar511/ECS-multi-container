@@ -1,12 +1,11 @@
 variable "create_acm" {
-  description = "Whether to create ACM Certificate and Route53 validation records. If false, auto-detect an existing cert."
-  type        = bool
-  default     = true
+  type    = bool
+  default = false
 }
 
 variable "domain_name" {
-  description = "Fully qualified domain name (FQDN) for the ACM certificate (e.g., *.example.com)"
   type        = string
+  description = "The domain name for the ACM certificate"
 }
 
 variable "hosted_zone_id" {

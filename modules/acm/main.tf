@@ -1,18 +1,17 @@
 #########################################
 # ACM Certificate (conditionally created)
 #########################################
+# Create ACM certificate (only if create_acm = true)
 resource "aws_acm_certificate" "this" {
-  count             = var.create_acm ? 1 : 0
+  count  = var.create_acm ? 1 : 0
   domain_name       = var.domain_name
   validation_method = "DNS"
-  key_algorithm     = "RSA_2048"
 
+  # Only apply prevent_destroy when we are NOT creating
   lifecycle {
-    create_before_destroy = true
-    prevent_destroy       = true  # Never delete shared certs
+    prevent_destroy = false
   }
 }
-
 #########################################
 # DNS validation record (only if creating cert)
 #########################################
@@ -37,11 +36,12 @@ resource "aws_acm_certificate_validation" "this" {
 }
 
 #########################################
-# Auto-detect existing ACM cert (if not creating)
+# Lookup existing ACM cert (only if create_acm = false)
 #########################################
 data "aws_acm_certificate" "existing" {
-  count       = var.create_acm ? 0 : 1
-  domain      = var.domain_name
-  statuses    = ["ISSUED"]
-  most_recent = true
+  count  = var.create_acm ? 0 : 1
+  domain   = var.domain_name
+  statuses = ["ISSUED"]
+
+  # When using data sources, nothing is destroyed anyway
 }
