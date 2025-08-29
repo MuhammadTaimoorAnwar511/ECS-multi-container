@@ -6,7 +6,7 @@
 # Toggle whether to create: task definition + ECS service 
 want_to_create_taskdef_and_service = true
 # Toggle whether to create: ACM + Route53 creation
-create_acm = true 
+create_acm = true
 # Toggle whether to create: HTTPS Listner + Route53 Record
 create_https_listener = true 
 

@@ -44,11 +44,11 @@ output "ecs_service_arn" {
 
 # ACM Certificate
 output "acm_certificate_arn" {
-  value = try(module.acm.certificate_arn, null)
+  value = module.acm.certificate_arn
 }
 output "acm_certificate_domain" {
-  value = try(module.acm.certificate_domain, null)
+  value = module.acm.certificate_domain
 }
 output "acm_certificate_validation_status" {
-  value = try(module.acm.certificate_validation_status, null)
+  value = module.acm.certificate_validation_status
 }

@@ -1,3 +1,6 @@
+#########################################
+# ACM Certificate (conditionally created)
+#########################################
 resource "aws_acm_certificate" "this" {
   count             = var.create_acm ? 1 : 0
   domain_name       = var.domain_name
@@ -6,8 +9,13 @@ resource "aws_acm_certificate" "this" {
 
   lifecycle {
     create_before_destroy = true
+    prevent_destroy       = true  # Never delete shared certs
   }
 }
+
+#########################################
+# DNS validation record (only if creating cert)
+#########################################
 resource "aws_route53_record" "validation" {
   count = var.create_acm ? length(tolist(aws_acm_certificate.this[0].domain_validation_options)) : 0
 
@@ -18,9 +26,22 @@ resource "aws_route53_record" "validation" {
   ttl     = 60
 }
 
+#########################################
+# Certificate validation (only if creating cert)
+#########################################
 resource "aws_acm_certificate_validation" "this" {
   count = var.create_acm ? 1 : 0
 
   certificate_arn         = aws_acm_certificate.this[0].arn
   validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
+}
+
+#########################################
+# Auto-detect existing ACM cert (if not creating)
+#########################################
+data "aws_acm_certificate" "existing" {
+  count       = var.create_acm ? 0 : 1
+  domain      = var.domain_name
+  statuses    = ["ISSUED"]
+  most_recent = true
 }

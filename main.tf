@@ -135,7 +135,7 @@ module "https_listener" {
   create_https_listener   = var.create_https_listener
   alb_arn                 = module.alb.alb_arn
   target_group_arn        = module.target_group.target_group_arn
-  certificate_arn         = module.acm.certificate_arn
+  certificate_arn         = module.acm.certificate_arn 
   https_domain            = var.https_domain
   hosted_zone_id          = var.hosted_zone_id
   alb_dns_name            = module.alb.alb_dns_name
