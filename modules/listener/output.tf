@@ -1,12 +1,15 @@
 # modules/listener/output.tf
 output "https_listener_arn" {
-  value = try(aws_lb_listener.https[0].arn, null)
+  description = "ARN of the HTTPS listener"
+  value       = aws_lb_listener.https.arn
 }
 
 output "https_listener_rule_arn" {
-  value = try(aws_lb_listener_rule.https_host_header[0].arn, null)
+  description = "ARN of the HTTPS listener rule"
+  value       = aws_lb_listener_rule.https_host_header.arn
 }
 
 output "https_record_fqdn" {
-  value = try(aws_route53_record.https_record[0].fqdn, null)
+  description = "FQDN of the Route53 record"
+  value       = aws_route53_record.https_record.fqdn
 }

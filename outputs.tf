@@ -44,11 +44,26 @@ output "ecs_service_arn" {
 
 # ACM Certificate
 output "acm_certificate_arn" {
-  value = module.acm.certificate_arn
+  value = var.want_to_create_taskdef_and_service ? module.acm[0].certificate_arn : null
 }
+
 output "acm_certificate_domain" {
-  value = module.acm.certificate_domain
+  value = var.want_to_create_taskdef_and_service ? module.acm[0].certificate_domain : null
 }
+
 output "acm_certificate_validation_status" {
-  value = module.acm.certificate_validation_status
+  value = var.want_to_create_taskdef_and_service ? module.acm[0].certificate_validation_status : null
+}
+
+
+output "https_listener_arn" {
+  value = var.want_to_create_taskdef_and_service && length(module.https_listener) > 0 ? module.https_listener[0].https_listener_arn : null
+}
+
+output "https_listener_rule_arn" {
+  value = var.want_to_create_taskdef_and_service && length(module.https_listener) > 0 ? module.https_listener[0].https_listener_rule_arn : null
+}
+
+output "https_record_fqdn" {
+  value = var.want_to_create_taskdef_and_service && length(module.https_listener) > 0 ? module.https_listener[0].https_record_fqdn : null
 }

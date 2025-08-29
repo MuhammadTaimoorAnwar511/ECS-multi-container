@@ -1,4 +1,4 @@
-
+#modules/acm/output.tf
 output "certificate_domain" {
   description = "Domain name of the ACM certificate"
   value       = var.create_acm ? try(aws_acm_certificate.this[0].domain_name, null) : try(data.aws_acm_certificate.existing[0].domain, null)

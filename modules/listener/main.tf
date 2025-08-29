@@ -1,7 +1,5 @@
-# modules/listener/main.tf
+#modules/listener/main.tf
 resource "aws_lb_listener" "https" {
-  count = var.create_https_listener ? 1 : 0
-
   load_balancer_arn = var.alb_arn
   port              = 443
   protocol          = "HTTPS"
@@ -15,11 +13,8 @@ resource "aws_lb_listener" "https" {
   }
 }
 
-# Optional: Add host header rule
 resource "aws_lb_listener_rule" "https_host_header" {
-  count = var.create_https_listener ? 1 : 0
-
-  listener_arn = aws_lb_listener.https[0].arn
+  listener_arn = aws_lb_listener.https.arn
   priority     = 1
 
   action {
@@ -34,10 +29,7 @@ resource "aws_lb_listener_rule" "https_host_header" {
   }
 }
 
-# Optional Route53 Record pointing domain to ALB DNS
 resource "aws_route53_record" "https_record" {
-  count = var.create_https_listener ? 1 : 0
-
   zone_id = var.hosted_zone_id
   name    = var.https_domain
   type    = "A"

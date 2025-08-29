@@ -122,20 +122,21 @@ module "ecs_service" {
 
 module "acm" {
   source         = "./modules/acm"
+  count          = var.want_to_create_taskdef_and_service ? 1 : 0
   domain_name    = var.domain_name
   hosted_zone_id = var.hosted_zone_id
   environment    = var.environment
   owner          = var.owner
   tags           = var.tags
-  create_acm     = var.create_acm  # NEW
+  create_acm     = var.create_acm
 }
 
 module "https_listener" {
   source                  = "./modules/listener"
-  create_https_listener   = var.create_https_listener
+  count                   = var.want_to_create_taskdef_and_service ? 1 : 0
   alb_arn                 = module.alb.alb_arn
   target_group_arn        = module.target_group.target_group_arn
-  certificate_arn         = module.acm.certificate_arn 
+  certificate_arn         = var.want_to_create_taskdef_and_service ? module.acm[0].certificate_arn : null 
   https_domain            = var.https_domain
   hosted_zone_id          = var.hosted_zone_id
   alb_dns_name            = module.alb.alb_dns_name

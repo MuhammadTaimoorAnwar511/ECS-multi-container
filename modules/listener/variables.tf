@@ -1,10 +1,4 @@
 # modules/listener/variables.tf
-variable "create_https_listener" {
-  description = "Whether to create HTTPS listener (true/false)"
-  type        = bool
-  default     = false
-}
-
 variable "alb_arn" {
   description = "ARN of the ALB to attach the HTTPS listener"
   type        = string

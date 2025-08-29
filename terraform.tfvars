@@ -2,13 +2,12 @@
 #######################################
 # DEFAULT
 #######################################
+# only  use this code if you HOSTED ZONE is on same AWS Account
 
 # Toggle whether to create: task definition + ECS service  +ACM + HTTPS listner
 want_to_create_taskdef_and_service = true
 # Toggle whether to create: ACM + Route53 creation
 create_acm = false
-# Toggle whether to create: HTTPS Listner + Route53 Record
-create_https_listener = true 
 
 #######################################
 # VPC CONFIGURATION
